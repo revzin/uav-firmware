@@ -72,10 +72,10 @@ int BRD_SetupMainClock(void)
 
 	/* ждём, пока не включилось (в битах статуса должно зажечься RCC_CFGR_SWS = 0x08) */
 	while (0x08 != (RCC->CFGR & RCC_CFGR_SWS)) {
-			++a;
-			__NOP();
-			if (a == nops) /* часы не запустились */
-					return 1;
+		++a;
+		__NOP();
+		if (a == nops) /* часы не запустились */
+				return 1;
 	};
 	return 0;
 }
