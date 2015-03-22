@@ -413,6 +413,16 @@
               <FileType>1</FileType>
               <FilePath>.\src\main.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_it.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\stm32f4xx_it.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_it.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\stm32f4xx_it.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1062,16 +1072,6 @@
               <FileName>board-clocks.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\common\board-drivers\clocking\board-clocks.h</FilePath>
-            </File>
-            <File>
-              <FileName>board-status-led.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\board_drivers\board-status-led.c</FilePath>
-            </File>
-            <File>
-              <FileName>board-status-led.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\src\board_drivers\board-status-led.h</FilePath>
             </File>
           </Files>
         </Group>
