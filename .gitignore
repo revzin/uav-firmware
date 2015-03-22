@@ -186,3 +186,4 @@ FakesAssemblies/
 Objects/
 Listings/
 
+*.exe
