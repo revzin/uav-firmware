@@ -107,5 +107,40 @@ void rcc_reset(void)
 	RCC->CIR = 0x00000000;
 
 	/* ожидаем сброса */
-	while (!(RCC->CFGR & RCC_CFGR_SWS));
+	//while (!(RCC->CFGR & RCC_CFGR_SWS));
+}
+
+/* Включает выход MCO2 на МК (PC9), при этом SYSCLK делится на 4 */
+void BRD_MCO_Enable(void)
+{
+	
+	
+	
+	__GPIOC_CLK_ENABLE();
+	__GPIOC_RELEASE_RESET();
+	
+	/* Режим порта в Alternate Function */
+	SET_BIT(GPIOC->MODER, GPIO_MODER_MODER9_1);
+	CLEAR_BIT(GPIOC->MODER, GPIO_MODER_MODER9_0);
+	
+	/* Скорость порта в высокую */
+	SET_BIT(GPIOC->OSPEEDR, GPIO_OSPEEDER_OSPEEDR9_1 | 
+								GPIO_OSPEEDER_OSPEEDR9_0);
+	
+	/* Выход делим на 4 */
+	MODIFY_REG(RCC->CFGR, RCC_CFGR_MCO2PRE_0, 
+							RCC_CFGR_MCO2PRE_1 | RCC_CFGR_MCO2PRE_2);
+	
+	/* Источник часов -- PLL (SYSCLK) */
+	CLEAR_BIT(RCC->CFGR, RCC_CFGR_MCO2);
+		
+	return;
+}
+
+
+/* Выключает */
+void BRD_MCO_Disable(void)
+{
+	/* выключаем AFIO */
+	CLEAR_BIT(GPIOC->MODER, GPIO_MODER_MODER9);
 }

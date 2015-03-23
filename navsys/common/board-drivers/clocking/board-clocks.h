@@ -21,4 +21,11 @@ void BRD_GetClockFrequences(BRD_ClockFreqs *s);
  */
 int BRD_SetupMainClock(void);
 
+
+/* Включает выход MCO1 на МК, при этом SYSCLK делится на 4 */
+void BRD_MCO_Enable(void);
+
+/* Выключает */
+void BRD_MCO_Disable(void);
+
 #endif /* __BOARD_CLOCKS_H__ */
