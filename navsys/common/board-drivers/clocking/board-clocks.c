@@ -6,6 +6,8 @@
 #include "system_stm32f4xx.h"
 
 #include "board-clocks.h"
+#include "ownassert.h"
+
 
 /* На плате установлен часовой генератор KC2520C26.0000C2LE00@AVX на 26 МГц. */
 
@@ -75,7 +77,7 @@ int BRD_SetupMainClock(void)
 		++a;
 		__NOP();
 		if (a == nops) /* часы не запустились */
-				return 1;
+			return 1;
 	};
 	return 0;
 }
@@ -113,9 +115,10 @@ void rcc_reset(void)
 /* Включает выход MCO2 на МК (PC9), при этом SYSCLK делится на 4 */
 void BRD_MCO_Enable(void)
 {
+	/* проверяем, что SDIO не в работе */
+	assert(!(READ_BIT(RCC->APB2ENR, RCC_APB2ENR_SDIOEN)), "Fatal: Cannot enable MCO while SDIO is in operation");
 	
-	
-	
+	/* Даём часы на PC */
 	__GPIOC_CLK_ENABLE();
 	__GPIOC_RELEASE_RESET();
 	
