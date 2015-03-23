@@ -8,7 +8,6 @@
 #include "board-clocks.h"
 #include "ownassert.h"
 
-
 /* На плате установлен часовой генератор KC2520C26.0000C2LE00@AVX на 26 МГц. */
 
 /** Устанавливает основные часы так:
@@ -82,28 +81,110 @@ int BRD_SetupMainClock(void)
 	return 0;
 }
 
-
 void BRD_GetClockFrequences(BRD_ClockFreqs *a)
-{
-	/* not implemented yet */
+{	
+	/* читаем содержимое битов RCC_CFGR_SWS */
+	int sysclk_source = READ_BIT(RCC->CFGR, RCC_CFGR_SWS) >> POSITION_VAL(RCC_CFGR_SWS);
+
+	/* табличка делителей APB (биты RCC_CFGR_PPRE) 	*/ 
+	/* 										000 	001 	010 	011 	100 	101		110		111 */
+	static const int apb_div_lookup[] = {	1,		1,		1,		1,		2,		4,		8,		16};
+	
+	/* табличка делителей AHB (биты RCC_CFGR_HPRE) 	*/ 
+	static const int ahb_div_lookup[] = {
+		/* 0000 */ 1,
+		/* 0001 */ 1,
+		/* 0010 */ 1,
+		/* 0011 */ 1,
+		/* 0100 */ 1,
+		/* 0101 */ 1,
+		/* 0110 */ 1,
+		/* 0111 */ 1,
+		/* 1000 */ 2,
+		/* 1001 */ 4,
+		/* 1010 */ 8,
+		/* 1011 */ 16,
+		/* 1100 */ 64,
+		/* 1101 */ 128,
+		/* 1110 */ 256,
+		/* 1111 */ 512
+	};
+	
+	
+	/* биты RCC_CFGR_PLLP */		/*	00	01	10	11 */
+	static const int pllp_lookup[] = {	2, 	4, 	6, 	8	};
+	
+	a->ahb_clk = a->apb1_clk = a->apb2_clk = a->sysclk = a->usb_clk = 0.0f;
+	
+	switch (sysclk_source) {
+		case 0x00: /* HSI */
+		{
+			a->sysclk = HSI_MHZ;
+			break;
+		}
+		case 0x01: /* HSE */
+		{
+			a->sysclk = HSE_MHZ;
+			break;
+		}
+		case 0x02: /* PLL */
+		{
+			short pll_mult = READ_BIT(RCC->PLLCFGR, RCC_PLLCFGR_PLLN) 
+										>> POSITION_VAL(RCC_PLLCFGR_PLLN);
+			short pll_div_sysclk = pllp_lookup[READ_BIT(RCC->PLLCFGR, RCC_PLLCFGR_PLLP) 
+										>> POSITION_VAL(RCC_PLLCFGR_PLLP)];
+			short pll_div_input = READ_BIT(RCC->PLLCFGR, RCC_PLLCFGR_PLLM) 
+										>> POSITION_VAL(RCC_PLLCFGR_PLLM);
+			short pll_div_usbee = READ_BIT(RCC->PLLCFGR, RCC_PLLCFGR_PLLQ) 
+										>> POSITION_VAL(RCC_PLLCFGR_PLLQ);
+	
+			float pll_out;
+			if (READ_BIT(RCC->PLLCFGR, RCC_PLLCFGR_PLLSRC)) {
+				/* ФАПЧ питается от HSE */
+				pll_out = HSE_MHZ / pll_div_input * pll_mult;
+			} 
+			else {
+				/* ФАПЧ питается от HSI */
+				pll_out = HSI_MHZ / pll_div_input * pll_mult;
+			}
+			
+			a->sysclk = pll_out / pll_div_sysclk;
+			a->usb_clk = pll_out / pll_div_usbee;
+			break;
+		}
+		case 0x03: /* WTF */
+		{
+			assert(0, "WTF, impossible on this hardware");
+		}
+	}
+	
+	short ahb_div = ahb_div_lookup[READ_BIT(RCC->CFGR, RCC_CFGR_HPRE) >> POSITION_VAL(RCC_CFGR_HPRE)];
+	short apb1_div = apb_div_lookup[READ_BIT(RCC->CFGR, RCC_CFGR_PPRE1) >> POSITION_VAL(RCC_CFGR_PPRE1)];
+	short apb2_div = apb_div_lookup[READ_BIT(RCC->CFGR, RCC_CFGR_PPRE2) >> POSITION_VAL(RCC_CFGR_PPRE2)];
+	
+	a->ahb_clk = a->sysclk / ahb_div;
+	a->apb1_clk = a->ahb_clk / apb1_div;
+	a->apb2_clk = a->ahb_clk / apb2_div;
+	a->abp1_tim_clk = a->apb1_clk * 2.0f;
+	a->abp2_tim_clk = a->apb2_clk * 2.0f;
 }
 
 
 void rcc_reset(void)
 {
-	RCC->CR |= (uint32_t)0x00000001;
+	RCC->CR |= (uint32_t) 0x00000001;
 
 	/* Reset CFGR register */
 	RCC->CFGR = 0x00000000;
 
 	/* Reset HSEON, CSSON and PLLON bits */
-	RCC->CR &= (uint32_t)0xFEF6FFFF;
+	RCC->CR &= (uint32_t) 0xFEF6FFFF;
 
 	/* Reset PLLCFGR register */
 	RCC->PLLCFGR = 0x24003010;
 
 	/* Reset HSEBYP bit */
-	RCC->CR &= (uint32_t)0xFFFBFFFF;
+	RCC->CR &= (uint32_t) 0xFFFBFFFF;
 
 	/* Disable all interrupts */
 	RCC->CIR = 0x00000000;
@@ -112,11 +193,17 @@ void rcc_reset(void)
 	//while (!(RCC->CFGR & RCC_CFGR_SWS));
 }
 
+
+void assert_sdio(void)
+{
+	assert(!(READ_BIT(RCC->APB2ENR, RCC_APB2ENR_SDIOEN)), "Fatal: Cannot enable MCO while SDIO is in operation");
+}
+
 /* Включает выход MCO2 на МК (PC9), при этом SYSCLK делится на 4 */
 void BRD_MCO_Enable(void)
 {
 	/* проверяем, что SDIO не в работе */
-	assert(!(READ_BIT(RCC->APB2ENR, RCC_APB2ENR_SDIOEN)), "Fatal: Cannot enable MCO while SDIO is in operation");
+	assert_sdio();
 	
 	/* Даём часы на PC */
 	__GPIOC_CLK_ENABLE();
@@ -144,6 +231,7 @@ void BRD_MCO_Enable(void)
 /* Выключает */
 void BRD_MCO_Disable(void)
 {
+	assert_sdio();
 	/* выключаем AFIO */
 	CLEAR_BIT(GPIOC->MODER, GPIO_MODER_MODER9);
 }

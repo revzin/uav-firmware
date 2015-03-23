@@ -5,12 +5,20 @@
 
 /* частоты основных шин часов в Гц */
 typedef struct {
-		float 	sysclk,
-						ahb_clk,
-						apb1_clk,
-						apb2_clk,
-						usb_clk;
+	float 	sysclk,
+			ahb_clk,
+			apb1_clk,
+			apb2_clk,
+			usb_clk,
+			abp1_tim_clk,
+			abp2_tim_clk;
 } BRD_ClockFreqs;
+
+/* частота внешнего генератора, МГц */
+#define HSE_MHZ 26.0f 
+
+/* частота внутреннего генератора, МГц */
+#define HSI_MHZ 16.0f
 
 /* рассчитывает и получает частоты основных шин */
 void BRD_GetClockFrequences(BRD_ClockFreqs *s);
@@ -20,7 +28,6 @@ void BRD_GetClockFrequences(BRD_ClockFreqs *s);
  *	Микроконтроллер останавливается на 20 мс при вызове функции.
  */
 int BRD_SetupMainClock(void);
-
 
 /* Включает выход MCO1 на МК, при этом SYSCLK делится на 4 */
 void BRD_MCO_Enable(void);
