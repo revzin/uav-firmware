@@ -212,6 +212,9 @@ void BRD_MCO_Enable(void)
 	/* Режим порта в Alternate Function */
 	SET_BIT(GPIOC->MODER, GPIO_MODER_MODER9_1);
 	CLEAR_BIT(GPIOC->MODER, GPIO_MODER_MODER9_0);
+
+	/* Alternate Function -- MCO */
+	CLEAR_BIT(GPIOC->AFR[1], GPIO_AF0_MCO);
 	
 	/* Скорость порта в высокую */
 	SET_BIT(GPIOC->OSPEEDR, GPIO_OSPEEDER_OSPEEDR9_1 | 
@@ -223,6 +226,7 @@ void BRD_MCO_Enable(void)
 	
 	/* Источник часов -- PLL (SYSCLK) */
 	CLEAR_BIT(RCC->CFGR, RCC_CFGR_MCO2);
+
 		
 	return;
 }
