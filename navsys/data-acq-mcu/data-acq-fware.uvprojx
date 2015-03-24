@@ -365,7 +365,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>.\src\libs\madgwick;..\common\board-drivers\data-exchange-bus;..\common\board-drivers\clocking;..\common\lib\cmsis\Include;..\common\lib\stm32f4-hal\Inc;..\common\lib\cmsis\Device\ST\STM32F4xx\Include</IncludePath>
+              <IncludePath>.\src\libs\madgwick;..\common\board-drivers\data-exchange-bus;..\common\board-drivers\clocking;..\common\lib\cmsis\Include;..\common\lib\stm32f4-hal\Inc;..\common\lib\cmsis\Device\ST\STM32F4xx\Include;..\common\lib</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1072,6 +1072,11 @@
               <FileName>board-clocks.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\common\board-drivers\clocking\board-clocks.h</FilePath>
+            </File>
+            <File>
+              <FileName>mpu9250.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\board_drivers\mpu9250.c</FilePath>
             </File>
           </Files>
         </Group>
