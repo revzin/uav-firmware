@@ -48,6 +48,19 @@ void SysTick_Handler(void)
 {
 }
 
+void SPI4_IRQHandler(void)
+{
+	__NOP();
+	__NOP();
+	int a = SPI4->DR;
+	__NOP();
+	__NOP();
+	__NOP();
+	__NOP();
+	__NOP();
+	__NOP();
+}
+
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
