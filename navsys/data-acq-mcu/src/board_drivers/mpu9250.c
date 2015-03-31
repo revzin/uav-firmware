@@ -27,9 +27,9 @@ volatile int imu2_lock_rx_stack 		= 0;
 
 volatile int imu2_state;
 
-#define REG_READ(x) ((x) | 0x40)		/* Добавляет к адресу регистра команду на чтение */
+#define REG_READ(x) (SET_BIT((x), 0x40))		/* Добавляет к адресу регистра команду на чтение */
 /* Указателем на чтение является 1 в 7 разряде адреса регистра */
-#define REG_WRITE(x) ((x) & (~0x40))	/* Добавляет к адресу регистра команду на запись */
+#define REG_WRITE(x) (CLEAR_BIT((x), 0x40))	/* Добавляет к адресу регистра команду на запись */
 
 
 inline void wait_imu2_tx_free()
@@ -48,28 +48,34 @@ void imu2_tx_push(char data)
 {
 	assert(imu2_tx_nelems < STACK_SIZE, "MPU9250 tx stack overflow");
 	imu2_tx_stack[imu2_tx_nelems] = data;
-	imu2_tx_nelems++;
+	++imu2_tx_nelems;
 }
 
 char imu2_tx_pop()
 {
 	assert(imu2_tx_nelems, "MPU9250 tried popping empty tx stack");
 	--imu2_tx_nelems;
-	return imu2_tx_stack[imu2_tx_nelems + 1];
+	return imu2_tx_stack[imu2_tx_nelems];
+}
+
+char imu2_tx_peek()
+{
+	assert(imu2_tx_nelems, "MPU9250 tried peeking empty tx stack");
+	return imu2_tx_stack[imu2_tx_nelems - 1];
 }
 
 void imu2_rx_push(char data)
 {
 	assert(imu2_rx_nelems < STACK_SIZE, "MPU9250 rx stack overflow");
 	imu2_rx_stack[imu2_rx_nelems] = data;
-	imu2_rx_nelems++;
+	++imu2_rx_nelems;
 }
 
 char imu2_rx_pop()
 {
 	assert(imu2_rx_nelems, "MPU9250 tried popping empty rx stack");
 	--imu2_rx_nelems;
-	return imu2_rx_stack[imu2_tx_nelems + 1];
+	return imu2_rx_stack[imu2_tx_nelems];
 }
 
 
@@ -79,7 +85,9 @@ void IMU2_ReadReg(MPU9250_REG_ADDRn reg)
 	
 	/* Атомарный доступ к стеку передачи */	
 	imu2_lock_tx_stack = 1;
+	
 	imu2_tx_push(REG_READ(reg));
+	
 	imu2_lock_tx_stack = 0;
 	/* Конец атомарного доступ к стеку передачи */
 	
@@ -94,8 +102,10 @@ void IMU2_WriteReg(MPU9250_REG_ADDRn reg, char data)
 		
 	/* Атомарный доступ к стеку передачи */	
 	imu2_lock_tx_stack = 1;
+	
 	imu2_tx_push(REG_WRITE(reg));
 	imu2_tx_push(data);
+	
 	imu2_lock_tx_stack = 0;
 	/* Конец атомарного доступ к стеку передачи */
 	
@@ -108,6 +118,8 @@ void IMU2_WriteReg(MPU9250_REG_ADDRn reg, char data)
 /* Обработчик прерывания */
 void IMU2_SPI4InterruptHandler()
 {
+	CLEAR_BIT(SPI4->CR1, SPI_CR2_RXNEIE | SPI_CR2_TXEIE);
+	
 	if (READ_BIT(SPI4->SR, SPI_SR_TXE)) {
 		/* Регистр отправки пуст! */
 		
@@ -121,14 +133,15 @@ void IMU2_SPI4InterruptHandler()
 			/* Если мы хотим прочесть регистр:
 			 * 1) 	если есть, что ещё отправлять, то сразу это и отправляем
 				При этом прочтётся результат предыдущего запроса, если он был.
-			 * 2) 	если нет, то отправляем 0x40 --- запрос на чтение нулевого регистра */
+			 * 2) 	если нет, то отправляем 0x40 -- запрос на чтение нулевого регистра,
+			 *  	что именно он там нам прочтёт, не интересно */
 			if (imu2_tx_nelems) 
 				SPI4->DR = imu2_tx_pop();
 			else
 				SPI4->DR = 0x40;
 		}
 		else {
-			/* Если мы хотим записать регистр: просто отправляем дальше */
+			/* Если мы хотим записать регистр: просто отправляем дальше наше данные */
 			if (imu2_tx_nelems)
 				SPI4->DR = imu2_tx_pop();	
 		}
@@ -138,7 +151,7 @@ void IMU2_SPI4InterruptHandler()
 	}
 
 	if (READ_BIT(SPI4->SR, SPI_SR_RXNE)) {
-		/* Регистр прихода полон! */
+		/* Входной регистр полон! */
 
 		if (imu2_state == STATE_WRITE) {
 			/* пустое чтение, не важно, что там прочлось */
@@ -161,13 +174,22 @@ void IMU2_SPI4InterruptHandler()
 	/* настраиваем состояние */
 	/* 1. было WRITE. Если дальше команда записи, оставляем WRITE */
 	if (imu2_state == STATE_WRITE) {
-		
+		if (imu2_tx_peek() | 0x40) {
+			/* значит, дальше чтение (1 в старшем бите) */
+			imu2_state = STATE_READ;
+		} 
+	}
+	else /* imu2_state == STATE_READ */ {
+		if (!(imu2_tx_peek() | 0x40)) {
+			imu2_state = STATE_WRITE;
+		}
 	}
 	
+	/* если больше передач нет и SPI свободно, выключаемся */
 	if (!imu2_tx_nelems && !READ_BIT(SPI4->SR, SPI_SR_BSY)) 
 		CLEAR_BIT(SPI4->CR1, SPI_CR1_SPE);
-		/* Если больше передач нет и SPI свободно, выключаемся */
 	
+	SET_BIT(SPI4->CR1, SPI_CR2_RXNEIE | SPI_CR2_TXEIE);
 }
 
 
