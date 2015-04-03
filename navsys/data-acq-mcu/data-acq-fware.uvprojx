@@ -1078,6 +1078,11 @@
               <FileType>1</FileType>
               <FilePath>.\src\board_drivers\mpu9250.c</FilePath>
             </File>
+            <File>
+              <FileName>ublox.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\ublox.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

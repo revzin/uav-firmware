@@ -8,6 +8,7 @@ typedef enum {
 	RA_ACCEL_CONFIG = 0x1C,
 	RA_ACCEL_CONFIG2 = 0x1D,
 	RA_SMPLRT_DIV = 0x19,
+	RA_USER_CONTROL = 0x6A,
 
 	/* Выходы гироскопа */
 	RA_ACCEL_XOUT_H = 0x3B,
@@ -31,22 +32,19 @@ typedef enum {
 } MPU9250_REG_ADDRn;
 
 
+/* Выполняет настройку контроллера для общения с датчиком */
+/* div -- делитель частоты по сравнению с AHB1 */
+void IMU1_Setup(int div);
 
+/* Отправляет стандартные настройки (DMA) на  */
+/* tx_finished_callback - функция, которая будет вызвана после передачи */
+void IMU1_TransmitSettings(void (*tx_finished_callback)());
 
+/* Приём всех навигационных данных (DMA)  */
+/* rx_finished_callback - функция, которая будет вызвана после передачи */
+void IMU1_ReadAllData(void (*rx_finished_callback)());
 
-void IMU_2_Setup(int div);
-
-void IMU_2_ReadCommand(MPU9250_REG_ADDRn reg);
-
-/* Добавляет в стек адрес регистра для чтения */
-void IMU2_ReadReg(MPU9250_REG_ADDRn reg);
-
-/* Добавляет в стек адрес регистра для записи и его новое значение */
-void IMU2_WriteReg(MPU9250_REG_ADDRn reg, char data);
-
-/* Обработчик прерывания */
-void IMU2_SPI4InterruptHandler(void);
-
-/* Запуск связи */
+/* Проверяет сенсор на работоспособность по стандартному ответу */
+int IMU1_TestSensor(void);
 
 #endif 
