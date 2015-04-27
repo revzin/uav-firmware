@@ -33,39 +33,6 @@ void nss_deselect(SPI_TypeDef *SPI)
 	CLEAR_BIT(SPI->CR1, SPI_CR1_SSI);
 }
 
-/* ==== Датчик A (DD4) находится на SPI4 ==== */
-
-void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
-{
-
-  GPIO_InitTypeDef GPIO_InitStruct;
-  if(hspi->Instance==SPI1)
-  {
-  /* USER CODE BEGIN SPI1_MspInit 0 */
-
-  /* USER CODE END SPI1_MspInit 0 */
-    /* Peripheral clock enable */
-    __SPI1_CLK_ENABLE();
-  
-    /**SPI1 GPIO Configuration    
-    PA5     ------> SPI1_SCK
-    PA6     ------> SPI1_MISO
-    PA7     ------> SPI1_MOSI 
-    */
-    GPIO_InitStruct.Pin = GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
-    GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  /* USER CODE BEGIN SPI1_MspInit 1 */
-
-  /* USER CODE END SPI1_MspInit 1 */
-  }
-
-}
-
 
 HAL_StatusTypeDef HAL_SPI_Init(SPI_HandleTypeDef *hspi)
 {
@@ -122,9 +89,28 @@ HAL_StatusTypeDef HAL_SPI_Init(SPI_HandleTypeDef *hspi)
   return HAL_OK;
 }
 
+/* Простая проверка работоспособности второго датчика. Останавливает программу */
+int IMU2_Test()
+{
+	SPI4->DR = READ_REG(RA_WHO_AM_I)
+	while (SPI4->SR | SPI_SR_BSY) {};
+	SPI4->DR = 0x40;
+	int reply = SPI4->DR;
+	if(reply != 0x00) 
+		return 0;
+	while (SPI4->SR | SPI_SR_BSY) {};
+	reply = SPI4->DR;
+	if (reply == 0x00)
+		return 0;
+	return 1;
+}
+
+
 /* готовит SPI1 к использованию, возвращает частоту обмена 
  * div --- делитель, степень двойки 2..256. SPI4 находится на APB2 */
+
 void IMU1_Setup(int div) 
+
 {
 	int a = 0;
 	
