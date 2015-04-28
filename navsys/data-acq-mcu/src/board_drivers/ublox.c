@@ -9,6 +9,8 @@
 #include "ublox.h"
 
 
+#ifdef USE_FULL_UBLOX_PROTOCOL
+
 #define LEA_HEADER 0xB5, 0x62
 #define CLASS_NAV 0x01
 #define CLASS_RXM 0x02
@@ -177,3 +179,113 @@ void UB_InterruptHandler()
 		}
 	}*/
 }
+
+#endif
+
+#ifdef USE_SIMPLE_LEA_PARSER
+
+#include <stdlib.h>
+#include <string.h>
+
+#define BUFFER_SIZE 100
+
+typedef enum 
+{
+	NAVSTATE_SHIT,
+	NAVSTATE_GOOD
+} navstate_n;
+
+typedef struct
+{
+	float lat, lon;
+	int timeoffix;
+	navstate_n navstate;
+} navdata;
+
+navdata nav_data;
+
+// Конечный автомат приёма 
+// ========================================= //
+
+typedef enum 
+{
+	STATE_FUCKED,
+	STATE_RX_ID,
+	STATE_RX_TIME,
+	STATE_RX_STATUS,
+	STATE_RX_LAT,
+	STATE_RX_LAT_S,
+	STATE_RX_LON,
+	STATE_RX_LON_S;
+} parser_state_n;
+
+
+int parser_state = STATE_FUCKED;
+
+char parser_buffer[100] = {'\0'};
+
+int buffer_counter = 0;
+
+void HandleParserInterrupt()
+{
+	char rxd = READ_REG(UART5->DR);
+	switch (parser_state) {
+		case STATE_FUCKED:
+		{
+			if (rxd == '$') {
+				/* пришёл доллар, значит, новое соообщение и следующим будет заголовок */
+				parser_state = STATE_RXID;
+				buffer_counter = 0;
+				goto ret;
+			}
+			break;
+		}
+		
+		case STATE_RX_ID:
+		{
+			if (rxd == ',') {
+				/* пришёл полностью заголовок. игнорируем все сообщения, кроме GPRMC */
+				if (!strncmp(parser_buffer, "GPRMC", 5)) {
+					parser_state = STATE_RX_TIME;
+					buffer_counter = 0;
+					/* дальше ловим время приёма */
+				}
+				else 
+					/* грустнявка */
+					state = STATE_FUCKED;
+				
+				goto ret;
+			}
+			else {
+				/* складываем пришедший байт в буфер */
+				parser_buffer[buffer_counter] = rxd;
+				buffer_counter++;
+			}
+			break;
+		}
+		
+		case STATE_RX_TIME:
+		{
+			if (rxd == ',') {
+				char secondary_buffer[10];
+				/* пришло полностью время */
+				nav_data.time_of_fix = atoi(parser_buffer);
+				buffer_counter = 0;
+				state = STATE_RX_STATUS;
+				goto ret;
+			}
+			else {
+				
+			}
+		}
+		
+		
+	}
+	
+	
+	ret:
+	
+}
+
+
+#endif
