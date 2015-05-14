@@ -1079,9 +1079,14 @@
               <FilePath>.\src\board_drivers\mpu9250.c</FilePath>
             </File>
             <File>
-              <FileName>ublox.c</FileName>
+              <FileName>ublox_rmc_parser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\ublox.c</FilePath>
+              <FilePath>.\src\board_drivers\ublox_rmc_parser.c</FilePath>
+            </File>
+            <File>
+              <FileName>ublox_rmc_parser.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\board_drivers\ublox_rmc_parser.h</FilePath>
             </File>
           </Files>
         </Group>
