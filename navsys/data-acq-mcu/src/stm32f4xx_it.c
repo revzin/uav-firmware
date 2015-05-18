@@ -35,7 +35,7 @@
 #include "stm32f4xx.h"
 #include "stm32f4xx_it.h"
 
-#include "ublox.h"
+#include "ublox_rmc_parser.h"
 
 /******************************************************************************/
 /*            Точки входа в прерывания микроконтроллера-сборщика              */ 
@@ -63,10 +63,9 @@ void SPI4_IRQHandler(void)
 	__NOP();
 }
 
-void UART6_IRQHandler(void)
+void UART5_IRQHandler(void)
 {
-	UB_InterruptHandler();
-	__NOP();
+	RMC_UART5_Handler();
 }
 
 /* USER CODE BEGIN 1 */

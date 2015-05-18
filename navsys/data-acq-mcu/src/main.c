@@ -3,7 +3,9 @@
 #include "board-clocks.h"
 
 #include "mpu9250.h"
-#include "ublox.h"
+#include "ublox_rmc_parser.h"
+
+#include "gptick.h"
 
 /* Точка входа микроконтроллера-сборщика данных */
 
@@ -16,19 +18,12 @@ int main(void)
 	
 	BRD_GetClockFrequences(&cf);
 	
-	UB_MCUConfig();
-	
+	/* запускаем КА парсинга RMC-строчек */
+	RMC_Enable();
 	
 
-	
-	//UB_SendPollHWConf();
 	for (;;) {
-		//UB_SendPollHWConf();
-		//for (int i = 0; i < 10000; ++i) {};
-
-		for (int i = 0; i < 255; ++i) {
-			UART5->DR = i;
-		}
+		__NOP();
 	}
 	return 0;
 }

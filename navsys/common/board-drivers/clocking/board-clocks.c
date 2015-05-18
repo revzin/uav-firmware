@@ -226,8 +226,7 @@ void BRD_MCO_Enable(void)
 	
 	/* Источник часов -- PLL (SYSCLK) */
 	CLEAR_BIT(RCC->CFGR, RCC_CFGR_MCO2);
-
-		
+	
 	return;
 }
 

@@ -7,9 +7,11 @@
 #include "stm32f4xx_hal_rcc.h"
 #include "stm32f4xx_hal_uart.h"
 
+#include "ublox_rmc_parser.h"
+
 #define BUF_SIZE (32)
 
-#define UART_RX UART5
+
 
 /* -------- прототипы локальных функций -------- */
 
@@ -32,8 +34,6 @@ void idlestate(void);
 void threadlock(void);
 void threadunlock(void);
 
-void uart_rxne_handler(void);
-
 /* --------------------------- */
 
 /* состояния парсинга NMEA-строки */
@@ -49,22 +49,11 @@ typedef enum
 	LOND
 } rxstate_n;
 
-/* состояние данных */
-typedef enum 
-{
-	GOOD, 							/* достоверно */
-	NMEA_PARSE_FAILED, 				/* строка не распарсилась */
-	RECIEVER_REPORTS_WARNING, 		/* V в строке */
-	POWER_UP 						/* с момента подачи питания ничего не произошло */
-} failure_mode_n;
 
-
-/* --------- состояние парсинга */
 typedef struct 
 {
 	float lat, lon;
-}	
-nav_data;
+}	nav_data;
 
 nav_data g_navdata;
 int g_lock = 0;						/* флаг, что nav_data занята */
@@ -73,7 +62,6 @@ char g_buffer[BUF_SIZE]; 			/* буфер чтения */
 int g_counter = 0; 					/* счётчик буфера чтения */
 int g_state = 0;   					/* состояние парсинга */
 int g_failure_mode = POWER_UP; 		/* состояние строки */
-
 
 
 /* --------- интерфейс -------- */
@@ -107,7 +95,7 @@ void RMC_Enable(void)
     GPIO_InitStruct.Alternate = GPIO_AF8_UART5;
     HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 	
-	SET_BIT(UART5->CR1, USART_CR1_UE | USART_CR1_RE | USART_CR1_TE);
+	SET_BIT(UART5->CR1, USART_CR1_UE | USART_CR1_RE);
 	NVIC_EnableIRQ(UART5_IRQn);
 }
 
@@ -133,10 +121,10 @@ int RMC_GetStatus(void)
 
 
 /* обработчик прерывания по приходу */
-void uart_rxne_handler(void)
+void RMC_UART5_Handler(void)
 {
 	/* конечный автомат, пробегает по RMC-строке, приходящей по одному байту с UART */
-	char rx = UART_RX->DR;
+	char rx = UART5->DR;
 	
 	switch (g_state) {
 		case IDLE:
@@ -255,7 +243,7 @@ void uart_rxne_handler(void)
 		{
 			if (rx == ',') {
 				if (!parselatd()) {
-					nextstate();
+					idlestate();
 				} 
 				else {
 					setfail(NMEA_PARSE_FAILED);
@@ -275,7 +263,7 @@ void uart_rxne_handler(void)
 
 void resetbuf() 
 {
-	memset((void *) g_buffer, '\0', 25 * sizeof(char));
+	memset((void *) g_buffer, '\0', BUF_SIZE * sizeof(char));
 	g_counter = 0;
 }
 
@@ -325,16 +313,13 @@ int parselat()
 
 int parselatd() 
 {		
-	if (g_buffer[0] == 'S')
-	{
+	if (g_buffer[0] == 'S') {
 		g_navdata.lat *= -1.0f;
 	}
-	else if (g_buffer[0] == 'N')
-	{
+	else if (g_buffer[0] == 'N') {
 		/* ничего не происходит */
 	}
-	else 
-	{
+	else {
 		return NMEA_PARSE_FAILED;
 	}
 	return 0;
@@ -350,16 +335,13 @@ int parselon()
 
 int parselond() 
 {		
-	if (g_buffer[0] == 'W')
-	{
+	if (g_buffer[0] == 'W') {
 		g_navdata.lon *= -1.0f;
 	}
-	else if (g_buffer[0] == 'E')
-	{
+	else if (g_buffer[0] == 'E') {
 		/* ничего не происходит */
 	}
-	else 
-	{
+	else {
 		return NMEA_PARSE_FAILED;
 	}
 	return 0;
