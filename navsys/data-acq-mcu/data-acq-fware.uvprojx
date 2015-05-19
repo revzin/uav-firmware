@@ -1074,14 +1074,14 @@
               <FilePath>..\common\board-drivers\clocking\board-clocks.h</FilePath>
             </File>
             <File>
-              <FileName>mpu9250.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\board_drivers\mpu9250.c</FilePath>
-            </File>
-            <File>
               <FileName>ublox_rmc_parser.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\board_drivers\ublox_rmc_parser.c</FilePath>
+            </File>
+            <File>
+              <FileName>mpu9250.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\board_drivers\mpu9250.c</FilePath>
             </File>
             <File>
               <FileName>ublox_rmc_parser.h</FileName>

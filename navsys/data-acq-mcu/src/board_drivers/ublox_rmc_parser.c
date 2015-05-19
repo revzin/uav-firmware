@@ -11,17 +11,15 @@
 
 #define BUF_SIZE (32)
 
-
-
 /* -------- прототипы локальных функций -------- */
 
-int parseid(void);
-int parsetof(void);
-int parsestat(void);
-int parselat(void);
-int parselatd(void);
-int parselon(void);
-int parselons(void);
+RMC_Status_n parseid(void);
+RMC_Status_n parsetof(void);
+RMC_Status_n parsestat(void);
+RMC_Status_n parselat(void);
+RMC_Status_n parselatd(void);
+RMC_Status_n parselon(void);
+RMC_Status_n parselond(void);
 
 void setfail(RMC_Status_n code);
 
@@ -53,15 +51,17 @@ typedef enum
 typedef struct 
 {
 	float lat, lon;
+	RMC_FixTime fixtime;
 }	nav_data;
 
 nav_data g_navdata;
-int g_lock = 0;						/* флаг, что nav_data занята */
 
-char g_buffer[BUF_SIZE]; 			/* буфер чтения */
-int g_counter = 0; 					/* счётчик буфера чтения */
-int g_state = 0;   					/* состояние парсинга */
-RMC_Status_n g_failure_mode = POWER_UP; 		/* состояние строки */
+int 			g_lock = 0;						/* флаг, что nav_data занята */
+
+char 			g_buffer[BUF_SIZE]; 			/* буфер чтения */
+int 			g_counter = 0; 					/* счётчик буфера чтения */
+rxstate_n 		g_state = IDLE;   				/* состояние парсинга */
+RMC_Status_n 	g_status = POWER_UP; 		/* состояние строки */
 
 
 /* --------- интерфейс -------- */
@@ -112,16 +112,17 @@ float RMC_GetLon(void)
 	return g_navdata.lon;
 }
 
+void RMC_GetFixTime(RMC_FixTime *ft)
+{
+	memcpy(ft, &g_navdata.fixtime, sizeof(RMC_FixTime));
+}
+
 RMC_Status_n RMC_GetStatus(void) 
 {
-	return  g_failure_mode;
+	return  g_status;
 }
 
 /* ------------------------------ */
-
-
-char g_debug_buf[1000];
-int g_debug_count = 0;
 
 /* обработчик прерывания по приходу */
 void RMC_UART5_Handler(void)
@@ -157,11 +158,14 @@ void RMC_UART5_Handler(void)
 		case TOF:
 		{
 			if (rx == ',') {
-				if (!parsetof()) {
+				threadlock();
+				RMC_Status_n stat = parsetof();
+				
+				if (!stat) {
 					nextstate();
 				} 
 				else {
-					setfail(NMEA_PARSE_FAILED);
+					setfail(stat);
 					idlestate();
 				}
 			}
@@ -178,7 +182,6 @@ void RMC_UART5_Handler(void)
 				if (!stat) {
 					/* всё хорошо, приёмник сказал 'A' = достоверные данные */
 					nextstate();
-					threadlock();
 				} 
 				else {
 					setfail((RMC_Status_n) stat);
@@ -242,7 +245,7 @@ void RMC_UART5_Handler(void)
 		case LOND:
 		{
 			if (rx == ',') {
-				if (!parselatd()) {
+				if (!parselond()) {
 					idlestate();
 				} 
 				else {
@@ -281,24 +284,51 @@ void idlestate() {
 	g_state = IDLE;
 }
 
-int parseid() {
+RMC_Status_n parseid() {
 	/* отбрасываюся все сообщения, кроме GPRMC */
-	return (strncmp("GPRMC", g_buffer, strlen("GPRMC")));
+	return (RMC_Status_n) (strncmp("GPRMC", g_buffer, strlen("GPRMC")));
 }
 
-int parsestat()
+RMC_Status_n parsestat()
 {
 	if (g_buffer[0] == 'A')
-		return 0;
+		return GOOD;
 	if (g_buffer[0] == 'V')
 		return RECIEVER_REPORTS_WARNING;
 	else
 		return NMEA_PARSE_FAILED;
 }
 
-int parsetof()
+RMC_Status_n parsetof()
 {
-	return !(g_counter > 0);
+	static char h[3] = {'\0'}, 
+				m[3] = {'\0'}, 
+			    *s = g_buffer + 4;
+	
+	if (strlen(g_buffer) < 6)
+		return RECIEVER_REPORTS_WARNING;
+	
+	memset(h, '\0', 3);
+	memset(m, '\0', 3);
+	
+	memcpy(h, g_buffer, 2 * sizeof(char));
+	memcpy(m, g_buffer, 2 * sizeof(char));
+	
+	
+	g_navdata.fixtime.h = (char) atoi(h);
+	g_navdata.fixtime.m = (char) atoi(m);
+	g_navdata.fixtime.s = (char) atoi(s);
+	
+	if (g_navdata.fixtime.h < 0 && g_navdata.fixtime.h > 24)
+		return RECIEVER_REPORTS_WARNING;
+	
+	if (g_navdata.fixtime.m < 0 && g_navdata.fixtime.m > 60)
+		return RECIEVER_REPORTS_WARNING;	
+	
+	if (g_navdata.fixtime.s < 0 && g_navdata.fixtime.s > 60)
+		return RECIEVER_REPORTS_WARNING;
+	
+	return GOOD;
 }
 
 /* RMC-угол ("5544.2222") в нормальный float в градусах */
@@ -324,15 +354,15 @@ float getangle(char *b, int lat)
 	return z + (f / 60.0f); 
 }
 
-int parselat() 
+RMC_Status_n parselat() 
 {		
 	g_navdata.lat = getangle(g_buffer, 1);
 	if (g_navdata.lat == 0.0f)
-		return 1;
-	return 0;
+		return NMEA_PARSE_FAILED;
+	return GOOD;
 }
 
-int parselatd() 
+RMC_Status_n parselatd() 
 {		
 	if (g_buffer[0] == 'S') {
 		g_navdata.lat *= -1.0f;
@@ -343,19 +373,19 @@ int parselatd()
 	else {
 		return NMEA_PARSE_FAILED;
 	}
-	return 0;
+	return GOOD;
 }
 
 
-int parselon() 
+RMC_Status_n parselon() 
 {	
 	g_navdata.lon = getangle(g_buffer, 0);
 		if (g_navdata.lon == 0.0f)
-		return 1;
-	return 0;
+		return NMEA_PARSE_FAILED;
+	return GOOD;
 }
 
-int parselond() 
+RMC_Status_n parselond() 
 {		
 	if (g_buffer[0] == 'W') {
 		g_navdata.lon *= -1.0f;
@@ -366,7 +396,7 @@ int parselond()
 	else {
 		return NMEA_PARSE_FAILED;
 	}
-	return 0;
+	return GOOD;
 }
 
 
@@ -382,5 +412,5 @@ void threadunlock()
 
 void setfail(RMC_Status_n c) 
 {
-	g_failure_mode = c;
+	g_status = c;
 }
