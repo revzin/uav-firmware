@@ -23,7 +23,7 @@ int parselatd(void);
 int parselon(void);
 int parselons(void);
 
-void setfail(int code);
+void setfail(RMC_Status_n code);
 
 void resetbuf(void);
 void next(char c);
@@ -61,7 +61,7 @@ int g_lock = 0;						/* флаг, что nav_data занята */
 char g_buffer[BUF_SIZE]; 			/* буфер чтения */
 int g_counter = 0; 					/* счётчик буфера чтения */
 int g_state = 0;   					/* состояние парсинга */
-int g_failure_mode = POWER_UP; 		/* состояние строки */
+RMC_Status_n g_failure_mode = POWER_UP; 		/* состояние строки */
 
 
 /* --------- интерфейс -------- */
@@ -95,7 +95,7 @@ void RMC_Enable(void)
     GPIO_InitStruct.Alternate = GPIO_AF8_UART5;
     HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 	
-	SET_BIT(UART5->CR1, USART_CR1_UE | USART_CR1_RE);
+	SET_BIT(UART5->CR1, USART_CR1_UE | USART_CR1_RE | USART_CR1_RXNEIE);
 	NVIC_EnableIRQ(UART5_IRQn);
 }
 
@@ -112,13 +112,16 @@ float RMC_GetLon(void)
 	return g_navdata.lon;
 }
 
-int RMC_GetStatus(void) 
+RMC_Status_n RMC_GetStatus(void) 
 {
-	return g_failure_mode;
+	return  g_failure_mode;
 }
 
 /* ------------------------------ */
 
+
+char g_debug_buf[1000];
+int g_debug_count = 0;
 
 /* обработчик прерывания по приходу */
 void RMC_UART5_Handler(void)
@@ -178,13 +181,12 @@ void RMC_UART5_Handler(void)
 					threadlock();
 				} 
 				else {
-					setfail(stat);
+					setfail((RMC_Status_n) stat);
 					idlestate();
 				}
 			}
 			else {
-				setfail(NMEA_PARSE_FAILED);
-				idlestate();
+				next(rx);
 				/* больше одного символа в поле статуса быть не может */
 			}
 			return;
@@ -217,9 +219,7 @@ void RMC_UART5_Handler(void)
 				}
 			}
 			else {
-				setfail(NMEA_PARSE_FAILED);
-				idlestate();
-				/* больше одного символа в поле обозначения широты быть не может */
+				next(rx);
 			}
 			return;				
 		}
@@ -251,9 +251,7 @@ void RMC_UART5_Handler(void)
 				}
 			}
 			else {
-				setfail(NMEA_PARSE_FAILED);
-				idlestate();
-				/* больше одного символа в поле обозначения дологты быть не может */
+				next(rx);
 			}
 			return;				
 		}
@@ -303,9 +301,32 @@ int parsetof()
 	return !(g_counter > 0);
 }
 
+/* RMC-угол ("5544.2222") в нормальный float в градусах */
+/*            ГГММ.ММММ  								*/  
+float getangle(char *b, int lat)
+{
+	char deg[4] = {'\0'},  /* +1 байт на завершение строки */
+				*min;	
+	
+	/* широта всегда 2 символа, долгота 3 */
+	if (lat) {
+		min =  b + 2; 	/* теперь указывает на минуты */
+		memcpy(deg, b, 2 * sizeof(char));
+	}
+	
+	if (!lat) { 
+		min = b + 3;
+		memcpy(deg, b, 3 * sizeof(char));
+	}
+	
+	float z = atof(deg),
+		  f = atof(min);
+	return z + (f / 60.0f); 
+}
+
 int parselat() 
 {		
-	g_navdata.lat = atof(g_buffer);
+	g_navdata.lat = getangle(g_buffer, 1);
 	if (g_navdata.lat == 0.0f)
 		return 1;
 	return 0;
@@ -325,9 +346,10 @@ int parselatd()
 	return 0;
 }
 
+
 int parselon() 
-{		
-	g_navdata.lon = atof(g_buffer);
+{	
+	g_navdata.lon = getangle(g_buffer, 0);
 		if (g_navdata.lon == 0.0f)
 		return 1;
 	return 0;
@@ -358,7 +380,7 @@ void threadunlock()
 	g_lock = 0;
 }
 
-void setfail(int c) 
+void setfail(RMC_Status_n c) 
 {
 	g_failure_mode = c;
 }

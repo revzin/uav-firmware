@@ -2,7 +2,6 @@
 
 #include "board-clocks.h"
 
-#include "mpu9250.h"
 #include "ublox_rmc_parser.h"
 
 #include "gptick.h"
@@ -11,6 +10,9 @@
 
 int main(void) 
 {
+	float lat, lon;
+	RMC_Status_n stat;
+	
 	/* настраиваем часы на 168 МГц */
 	BRD_SetupMainClock();
 	
@@ -24,6 +26,14 @@ int main(void)
 
 	for (;;) {
 		__NOP();
+		stat = RMC_GetStatus();
+		lat = RMC_GetLat();
+		lon = RMC_GetLat();
+		
+		if (stat == POWER_UP)
+			lat += lon;
+		
 	}
+	
 	return 0;
 }
