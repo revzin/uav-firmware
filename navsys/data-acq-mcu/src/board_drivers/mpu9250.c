@@ -58,7 +58,7 @@ HAL_StatusTypeDef HAL_SPI_Init(SPI_HandleTypeDef *hspi)
   if(hspi->State == HAL_SPI_STATE_RESET)
   {
     /* Init the low level hardware : GPIO, CLOCK, NVIC... */
-    HAL_SPI_MspInit(hspi);
+    //HAL_SPI_MspInit(hspi);
   }
   
   hspi->State = HAL_SPI_STATE_BUSY;
@@ -92,7 +92,7 @@ HAL_StatusTypeDef HAL_SPI_Init(SPI_HandleTypeDef *hspi)
 /* Простая проверка работоспособности второго датчика. Останавливает программу */
 int IMU2_Test()
 {
-	SPI4->DR = READ_REG(RA_WHO_AM_I)
+	SPI4->DR = READ_REG(RA_WHO_AM_I);
 	while (SPI4->SR | SPI_SR_BSY) {};
 	SPI4->DR = 0x40;
 	int reply = SPI4->DR;

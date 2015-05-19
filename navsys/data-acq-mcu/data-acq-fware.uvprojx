@@ -177,8 +177,8 @@
           <Flash2>BIN\UL2CM3.DLL</Flash2>
           <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
-          <pFcarmOut></pFcarmOut>
-          <pFcarmGrp></pFcarmGrp>
+          <pFcarmOut>fcarm</pFcarmOut>
+          <pFcarmGrp>main</pFcarmGrp>
           <pFcArmRoot></pFcArmRoot>
           <FcArmLst>0</FcArmLst>
         </Utilities>
@@ -1095,7 +1095,7 @@
             </File>
             <File>
               <FileName>gptick.h</FileName>
-              <FileType>9</FileType>
+              <FileType>5</FileType>
               <FilePath>..\common\board-drivers\gptick.h</FilePath>
             </File>
           </Files>
