@@ -76,7 +76,6 @@ void RMC_Enable(void)
 	
 	assert(cf.apb1_clk == 42.0f, "Bad APB1 clock frequency");
 	
-	__GPIOC_CLK_ENABLE();
 	__GPIOD_CLK_ENABLE();
 	__UART5_CLK_ENABLE();
 	/* при частоте APB1 42 МГц для бодрейта 9600 в BRR 
@@ -88,13 +87,6 @@ void RMC_Enable(void)
 	
 	GPIO_InitTypeDef GPIO_InitStruct;
 	
-	GPIO_InitStruct.Pin = GPIO_PIN_12;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF8_UART5;
-    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
     GPIO_InitStruct.Pin = GPIO_PIN_2;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
