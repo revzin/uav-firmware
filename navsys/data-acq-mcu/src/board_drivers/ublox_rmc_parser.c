@@ -312,7 +312,7 @@ RMC_Status_n parsetof()
 	memset(m, '\0', 3);
 	
 	memcpy(h, g_buffer, 2 * sizeof(char));
-	memcpy(m, g_buffer, 2 * sizeof(char));
+	memcpy(m, g_buffer + 2, 2 * sizeof(char));
 	
 	
 	g_navdata.fixtime.h = (char) atoi(h);
