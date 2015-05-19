@@ -8,6 +8,9 @@
 #include "stm32f4xx_hal_uart.h"
 
 #include "ublox_rmc_parser.h"
+#include "board-clocks.h"
+#include "ownassert.h"
+
 
 #define BUF_SIZE (32)
 
@@ -68,9 +71,13 @@ RMC_Status_n 	g_status = POWER_UP; 		/* состояние строки */
 
 void RMC_Enable(void)
 {
+	BRD_ClockFreqs cf;
+	BRD_GetClockFrequences(&cf);
+	
+	assert(cf.apb1_clk == 42.0f, "Bad APB1 clock frequency");
+	
 	__GPIOC_CLK_ENABLE();
 	__GPIOD_CLK_ENABLE();
-	
 	__UART5_CLK_ENABLE();
 	/* при частоте APB1 42 МГц для бодрейта 9600 в BRR 
 	 * записывается 273.4375 */
