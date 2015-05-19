@@ -16,7 +16,7 @@
 
 /* -------- прототипы локальных функций -------- */
 
-RMC_Status_n parseid(void);
+int parseid(void);
 RMC_Status_n parsetof(void);
 RMC_Status_n parsestat(void);
 RMC_Status_n parselat(void);
@@ -193,6 +193,7 @@ void RMC_UART5_Handler(void)
 			}
 			return;
 		}
+		/* --------------------- */
 		case LAT:
 		{
 			if (rx == ',') {
@@ -209,6 +210,7 @@ void RMC_UART5_Handler(void)
 			}
 			return;				
 		}
+		/* --------------------- */
 		case LATD:
 		{
 			if (rx == ',') {
@@ -225,6 +227,7 @@ void RMC_UART5_Handler(void)
 			}
 			return;				
 		}
+		/* --------------------- */
 		case LON:
 		{
 			if (rx == ',') {
@@ -241,6 +244,7 @@ void RMC_UART5_Handler(void)
 			}
 			return;		
 		}
+		/* --------------------- */
 		case LOND:
 		{
 			if (rx == ',') {
@@ -283,9 +287,9 @@ void idlestate() {
 	g_state = IDLE;
 }
 
-RMC_Status_n parseid() {
+int parseid() {
 	/* отбрасываюся все сообщения, кроме GPRMC */
-	return (RMC_Status_n) (strncmp("GPRMC", g_buffer, strlen("GPRMC")));
+	return  strncmp("GPRMC", g_buffer, strlen("GPRMC"));
 }
 
 RMC_Status_n parsestat()
