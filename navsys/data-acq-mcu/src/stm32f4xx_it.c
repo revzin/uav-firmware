@@ -72,7 +72,7 @@ void DMA1_Stream6_IRQHandler(void)
 
 void USART2_IRQHandler(void)
 {
-	MCB_TxBUS1_UART5_Handler();
+	MCB_TxBUS1_USART2_Handler();
 }
 
 /* USER CODE BEGIN 1 */

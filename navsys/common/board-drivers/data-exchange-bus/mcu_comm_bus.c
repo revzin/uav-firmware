@@ -12,6 +12,7 @@
 
 /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////
+//            MCB_TxBUS1     
 //		|--------|               |--------|
 //		| USRT2  | ----->BUS1>---| USRT2  |
 //		|		 |               |        | --------- USBFS ---->
@@ -41,7 +42,7 @@ void MCB_SetupBUS1(void)
 	USART2->BRR = (z << 4) | frac;
 	
 	GPIO_InitTypeDef GPIO_InitStruct;
-    GPIO_InitStruct.Pin = GPIO_PIN_2 |  GPIO_PIN_3 |  GPIO_PIN_4;
+    GPIO_InitStruct.Pin = GPIO_PIN_2 | GPIO_PIN_3 |  GPIO_PIN_4;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
     GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
@@ -109,18 +110,32 @@ int g_pc_character = 0;
 int g_size = 0;
 char *g_data = 0;
 
+#ifdef MCUB
+void (*g_rx_complete_callback)(void);
+#endif
 
-void MCB_TxBUS1_UART5_Handler(void)
+void MCB_TxBUS1_USART2_Handler(void)
 {
+#ifdef MCUA
 	USART2->DR = g_data[g_pc_character];
 	g_pc_character++;
 	if (g_size ==  g_pc_character) {
 		CLEAR_BIT(USART2->CR1, USART_CR1_TXEIE);
 		g_pc_character = 0;
 	}
+#endif
+
+#ifdef MCUB
+	g_data[g_pc_character] = USART2->DR;
+	g_pc_character++;
+	if (g_pc_character == g_size) {
+		g_rx_complete_callback();
+		g_pc_character = 0;
+	}
+#endif		
 }
 
-
+#ifdef MCUA
 void MCB_TxBUS1(void *data, unsigned short size)
 {
 	while (g_pc_character) {__NOP();}
@@ -129,3 +144,17 @@ void MCB_TxBUS1(void *data, unsigned short size)
 	g_data = (char *) data;
 	SET_BIT(USART2->CR1, USART_CR1_TXEIE);
 }
+#endif
+
+#ifdef MCUB
+/*                         куда            сколько        что потом вызвать */
+void MCB_SetupRxBUS1(void *data, unsigned short size, void (*rx_complete_callback)(void))
+{
+	g_data = data;
+	g_size = size;
+	g_rx_complete_callback = rx_complete_callback;
+	SET_BIT(USART2->CR1, USART_CR1_RXNEIE);
+	NVIC_EnableIRQ(USART2_IRQn);
+	//USART2->DR = 1;
+}
+#endif

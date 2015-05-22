@@ -82,27 +82,27 @@
         <Book>
           <Number>0</Number>
           <Title>Getting Started (STM32F429I-Discovery)</Title>
-          <Path>C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.3.0\MDK\Boards\ST\STM32F429I-Discovery\Documentation\DM00092920.pdf</Path>
+          <Path>D:\ARM-MDK\ARM\PACK\Keil\STM32F4xx_DFP\2.3.0\MDK\Boards\ST\STM32F429I-Discovery\Documentation\DM00092920.pdf</Path>
         </Book>
         <Book>
           <Number>1</Number>
           <Title>User Manual (STM32F429I-Discovery)</Title>
-          <Path>C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.3.0\MDK\Boards\ST\STM32F429I-Discovery\Documentation\DM00093903.pdf</Path>
+          <Path>D:\ARM-MDK\ARM\PACK\Keil\STM32F4xx_DFP\2.3.0\MDK\Boards\ST\STM32F429I-Discovery\Documentation\DM00093903.pdf</Path>
         </Book>
         <Book>
           <Number>2</Number>
           <Title>Bill of Materials (STM32F429I-Discovery)</Title>
-          <Path>C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.3.0\MDK\Boards\ST\STM32F429I-Discovery\Documentation\stm32f429i-disco_bom.zip</Path>
+          <Path>D:\ARM-MDK\ARM\PACK\Keil\STM32F4xx_DFP\2.3.0\MDK\Boards\ST\STM32F429I-Discovery\Documentation\stm32f429i-disco_bom.zip</Path>
         </Book>
         <Book>
           <Number>3</Number>
           <Title>Gerber Files (STM32F429I-Discovery)</Title>
-          <Path>C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.3.0\MDK\Boards\ST\STM32F429I-Discovery\Documentation\stm32f429i-disco_gerber.zip</Path>
+          <Path>D:\ARM-MDK\ARM\PACK\Keil\STM32F4xx_DFP\2.3.0\MDK\Boards\ST\STM32F429I-Discovery\Documentation\stm32f429i-disco_gerber.zip</Path>
         </Book>
         <Book>
           <Number>4</Number>
           <Title>Schematics (STM32F429I-Discovery)</Title>
-          <Path>C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.3.0\MDK\Boards\ST\STM32F429I-Discovery\Documentation\stm32f429i-disco_sch.zip</Path>
+          <Path>D:\ARM-MDK\ARM\PACK\Keil\STM32F4xx_DFP\2.3.0\MDK\Boards\ST\STM32F429I-Discovery\Documentation\stm32f429i-disco_sch.zip</Path>
         </Book>
         <Book>
           <Number>5</Number>
@@ -181,9 +181,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>21</LineNumber>
+          <LineNumber>43</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134219722</Address>
+          <Address>134220406</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -197,7 +197,23 @@
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>30</LineNumber>
+          <LineNumber>19</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134220606</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\src\main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>44</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>0</Address>
           <ByteObject>0</ByteObject>
@@ -211,6 +227,13 @@
           <Expression></Expression>
         </Bp>
       </Breakpoint>
+      <WatchWindow1>
+        <Ww>
+          <count>0</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>g_rxnavdata</ItemText>
+        </Ww>
+      </WatchWindow1>
       <Tracepoint>
         <THDelay>0</THDelay>
       </Tracepoint>
@@ -242,6 +265,12 @@
       </DebugFlag>
       <LintExecutable></LintExecutable>
       <LintConfigFile></LintConfigFile>
+      <SystemViewers>
+        <Entry>
+          <Name>System Viewer\USART2</Name>
+          <WinId>35905</WinId>
+        </Entry>
+      </SystemViewers>
     </TargetOption>
   </Target>
 
@@ -434,6 +463,38 @@
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>19</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>.\src\main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>3</Number>
+          <Type>0</Type>
+          <LineNumber>44</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>.\src\main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
       </Breakpoint>
       <Tracepoint>
         <THDelay>0</THDelay>
@@ -518,7 +579,7 @@
 
   <Group>
     <GroupName>cmsis</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -591,7 +652,7 @@
 
   <Group>
     <GroupName>startup</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -638,7 +699,7 @@
 
   <Group>
     <GroupName>stm32hal</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2233,6 +2294,19 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\common\lib\ownassert.h</PathWithFileName>
       <FilenameWithoutPath>ownassert.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>5</GroupNumber>
+      <FileNumber>134</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\common\board-drivers\data-exchange-bus\mcu_comm_bus.c</PathWithFileName>
+      <FilenameWithoutPath>mcu_comm_bus.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

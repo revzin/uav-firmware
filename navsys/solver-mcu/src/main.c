@@ -3,8 +3,16 @@
 #include "board-clocks.h"
 #include "board-status-led.h"
 
-/* Точка входа микроконтроллера-решателя */
+#include "mcu_common_types.h"
+#include "mcu_comm_bus.h"
+#include "string.h"
 
+
+void NavdataRecieved(void);
+
+PackedNavdata g_rxnavdata;
+
+/* Точка входа микроконтроллера-решателя */
 int main(void) 
 {
 	/* настраиваем часы на 168 МГц */
@@ -20,10 +28,18 @@ int main(void)
 	
 	BRD_GetClockFrequences(&a);
 	
+	MCB_SetupBUS1();
+	MCB_SetupRxBUS1(&g_rxnavdata, sizeof(PackedNavdata), NavdataRecieved);
+	
+	
 	for (;;) {
-
+		__NOP();
 	}
 	
-	//return 0;
 }
 
+/* Коллбек, когда приходят навигационные данные */
+void NavdataRecieved(void)
+{
+	__NOP();
+}

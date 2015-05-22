@@ -34,6 +34,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
 #include "stm32f4xx_it.h"
+#include "mcu_comm_bus.h"
 
 
 /******************************************************************************/
@@ -46,6 +47,12 @@
 void SysTick_Handler(void)
 {
 }
+
+
+void USART2_IRQHandler(void)
+{
+	MCB_TxBUS1_USART2_Handler();
+}	
 
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
