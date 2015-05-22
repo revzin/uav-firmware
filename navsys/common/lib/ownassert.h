@@ -1,7 +1,7 @@
 #ifndef __OWNASSERT_H__
 #define __OWNASSERT_H__
 
-#ifdef ASSERT_ENABLED
+#ifndef ASSERT_DISABLED
 #define assert(x, s) if (!(x)) __assert_handler((s));
 #else
 #define assert(x, s) ;

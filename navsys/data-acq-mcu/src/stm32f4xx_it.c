@@ -36,6 +36,8 @@
 #include "stm32f4xx_it.h"
 
 #include "ublox_rmc_parser.h"
+#include "gptick.h"
+#include "mcu_comm_bus.h"
 
 /******************************************************************************/
 /*            Точки входа в прерывания микроконтроллера-сборщика              */ 
@@ -50,22 +52,27 @@ void SysTick_Handler(void)
 {
 }
 
-void SPI4_IRQHandler(void)
+void TIM6_DAC_IRQHandler(void)
 {
-	__NOP();
-	__NOP();
-	int a = SPI4->DR;
-	__NOP();
-	__NOP();
-	__NOP();
-	__NOP();
-	__NOP();
-	__NOP();
+	GPTICK_TIM6_InterruptHandler();
 }
 
 void UART5_IRQHandler(void)
 {
 	RMC_UART5_Handler();
+}
+
+#if 0
+void DMA1_Stream6_IRQHandler(void)
+{
+	MCB_TxBUS1_DMAInterruptHandler();
+}
+#endif
+
+
+void USART2_IRQHandler(void)
+{
+	MCB_TxBUS1_UART5_Handler();
 }
 
 /* USER CODE BEGIN 1 */
