@@ -25,5 +25,20 @@ void BRD_StatusLedOn()
 
 void BRD_StatusLedOff()
 {
-	SET_BIT(GPIOA->BSRRH, GPIO_BSRR_BR_7);
+	SET_BIT(GPIOA->BSRRL, GPIO_BSRR_BR_7);
+	CLEAR_BIT(GPIOA->ODR, GPIO_ODR_ODR_7);
+}
+
+
+int BRD_IsStatusLedOn()
+{
+	return READ_BIT(GPIOA->ODR, GPIO_ODR_ODR_7);
+}
+
+void BRD_ToggleStatusLed(void)
+{
+	if (BRD_IsStatusLedOn())
+		BRD_StatusLedOff();
+	else
+		BRD_StatusLedOn();
 }

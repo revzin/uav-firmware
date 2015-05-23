@@ -5,8 +5,6 @@
 
 #include "mcu_common_types.h"
 #include "mcu_comm_bus.h"
-#include "string.h"
-
 
 void NavdataRecieved(void);
 
@@ -18,19 +16,15 @@ int main(void)
 	/* настраиваем часы на 168 МГц */
 	BRD_SetupMainClock();
 	
-	/* */
+	/* настраиваем порт светодиода */
 	BRD_InitStatusLedControl();
 	
+	/* зажигаем светодиод */
 	BRD_StatusLedOn();
-	BRD_MCO_Enable();
 	
-	BRD_ClockFreqs a;
-	
-	BRD_GetClockFrequences(&a);
-	
+	/* настраиваем USART2 для приёма */
 	MCB_SetupBUS1();
 	MCB_SetupRxBUS1(&g_rxnavdata, sizeof(PackedNavdata), NavdataRecieved);
-	
 	
 	for (;;) {
 		__NOP();
@@ -41,5 +35,6 @@ int main(void)
 /* Коллбек, когда приходят навигационные данные */
 void NavdataRecieved(void)
 {
+	BRD_ToggleStatusLed();
 	__NOP();
 }

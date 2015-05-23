@@ -12,4 +12,10 @@ void BRD_StatusLedOn(void);
 /* гасит светодиод */
 void BRD_StatusLedOff(void);
 
+/* светодиод горит? */
+int BRD_IsStatusLedOn(void);
+
+/* переключение */
+void BRD_ToggleStatusLed(void);
+
 #endif /* __BOARD_STATUS_LED__ */
