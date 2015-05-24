@@ -50,7 +50,7 @@
           <OutputName>solver-fware-executable</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
-          <CreateHexFile>1</CreateHexFile>
+          <CreateHexFile>0</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
           <ListingPath>.\Listings\</ListingPath>
@@ -774,11 +774,6 @@
               <FilePath>..\common\lib\stm32f4-hal\Inc\stm32f4xx_ll_sdmmc.h</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_ll_usb.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\common\lib\stm32f4-hal\Inc\stm32f4xx_ll_usb.h</FilePath>
-            </File>
-            <File>
               <FileName>stm32f4xx_hal_nor.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\common\lib\stm32f4-hal\Src\stm32f4xx_hal_nor.c</FilePath>
@@ -1057,11 +1052,6 @@
               <FileName>stm32f4xx_ll_sdmmc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\common\lib\stm32f4-hal\Src\stm32f4xx_ll_sdmmc.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_ll_usb.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\common\lib\stm32f4-hal\Src\stm32f4xx_ll_usb.c</FilePath>
             </File>
           </Files>
         </Group>

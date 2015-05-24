@@ -95,6 +95,8 @@ void RMC_Enable(void)
     HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 	
 	SET_BIT(UART5->CR1, USART_CR1_UE | USART_CR1_RE | USART_CR1_RXNEIE);
+	
+	NVIC_SetPriority(UART5_IRQn, 1);
 	NVIC_EnableIRQ(UART5_IRQn);
 }
 
@@ -132,8 +134,10 @@ void RMC_UART5_Handler(void)
 	switch (g_state) {
 		case IDLE:
 		{
-			if (rx == '$') 
+			if (rx == '$') {
 				nextstate();
+				threadlock();
+			}
 			return;
 		}
 		/* --------------------- */
@@ -144,7 +148,7 @@ void RMC_UART5_Handler(void)
 					nextstate();
 				} 
 				else {
-					setfail(NMEA_PARSE_FAILED);
+					//setfail(NMEA_PARSE_FAILED);
 					idlestate();
 				}
 			}
@@ -157,7 +161,6 @@ void RMC_UART5_Handler(void)
 		case TOF:
 		{
 			if (rx == ',') {
-				threadlock();
 				RMC_Status_n stat = parsetof();
 				
 				if (!stat) {
@@ -165,6 +168,7 @@ void RMC_UART5_Handler(void)
 				} 
 				else {
 					setfail(stat);
+					memset(&g_navdata.fixtime, 0, sizeof(RMC_FixTime));
 					idlestate();
 				}
 			}
@@ -181,6 +185,7 @@ void RMC_UART5_Handler(void)
 				if (!stat) {
 					/* всё хорошо, приёмник сказал 'A' = достоверные данные */
 					nextstate();
+					g_status = GOOD;
 				} 
 				else {
 					setfail((RMC_Status_n) stat);
@@ -411,6 +416,11 @@ void threadlock()
 void threadunlock()
 {
 	g_lock = 0;
+}
+
+int RMC_IsLocked(void)
+{
+	return g_lock;
 }
 
 void setfail(RMC_Status_n c) 

@@ -24,10 +24,19 @@ int main(void)
 	
 	/* 1 КГц - часы таймера, считаем до 500, 2 Гц - прерывание */
 	int prescale = 500 * cf.abp1_tim_clk;
-	
-	
-	GPTICK_Setup(prescale, 1000, send_navdata);
+	GPTICK_Setup(prescale, 2000, send_navdata, 10);
 	GPTICK_EnableTIM6Interrupt();
+	
+	/* важно: приоритет прерывания GPTICK должен быть ниже, чем у 
+	 * прерывания КА парсинга. иначе происиходит такой сценарий:
+	 * 1) шёл парсинг, вызвался threadlock() 
+	 * 2) между приёмом букв срабатывает GPTICK 
+	 * 3) GPTICK теперь ждёт вызова threadunlock()
+	 * 4) КА парсинга не может перехватить управление у 
+	 *    прерывания с тем же приоритетом
+	 * 5) deadlock
+	*/
+	
 	
 	for (;;) {
 		__NOP();
