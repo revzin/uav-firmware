@@ -7,7 +7,7 @@
 
 void (*g_callback)(void);
 
-int GPTICK_Setup(int prescale, int val, void (*callback)(void))
+int GPTICK_Setup(int prescale, int val, void (*callback)(void), unsigned char priority)
 {
 	if (prescale == 1) 
 		return 1;
@@ -23,6 +23,8 @@ int GPTICK_Setup(int prescale, int val, void (*callback)(void))
 	TIM6->ARR = val;
 	SET_BIT(TIM6->CR1, TIM_CR1_ARPE);
 	SET_BIT(TIM6->DIER, TIM_DIER_UIE);
+	
+	NVIC_SetPriority(TIM6_DAC_IRQn, priority);
 	
 	return 0;
 }
