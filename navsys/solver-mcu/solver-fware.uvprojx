@@ -363,9 +363,9 @@
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>MCUB</Define>
+              <Define>MCUB, USE_USB_OTG_FS</Define>
               <Undefine></Undefine>
-              <IncludePath>.\src\libs\madgwick;..\common\board-drivers\data-exchange-bus;..\common\board-drivers\clocking;..\common\lib\cmsis\Include;..\common\lib\stm32f4-hal\Inc;..\common\lib\cmsis\Device\ST\STM32F4xx\Include;.\src\board_drivers;..\common\lib;..\common\board-drivers;..\common</IncludePath>
+              <IncludePath>.\src\libs\madgwick;..\common\board-drivers\data-exchange-bus;..\common\board-drivers\clocking;..\common\lib\cmsis\Include;..\common\lib\stm32f4-hal\Inc;..\common\lib\cmsis\Device\ST\STM32F4xx\Include;.\src\board_drivers;..\common\lib;..\common\board-drivers;..\common;.\src\libs\usb_cdc_device</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -769,11 +769,6 @@
               <FilePath>..\common\lib\stm32f4-hal\Inc\stm32f4xx_ll_sdmmc.h</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_ll_usb.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\common\lib\stm32f4-hal\Inc\stm32f4xx_ll_usb.h</FilePath>
-            </File>
-            <File>
               <FileName>stm32f4xx_hal_nor.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\common\lib\stm32f4-hal\Src\stm32f4xx_hal_nor.c</FilePath>
@@ -1053,11 +1048,6 @@
               <FileType>1</FileType>
               <FilePath>..\common\lib\stm32f4-hal\Src\stm32f4xx_ll_sdmmc.c</FilePath>
             </File>
-            <File>
-              <FileName>stm32f4xx_ll_usb.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\common\lib\stm32f4-hal\Src\stm32f4xx_ll_usb.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1097,6 +1087,181 @@
               <FileName>mcu_comm_bus.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\common\board-drivers\data-exchange-bus\mcu_comm_bus.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>usb-cdc</GroupName>
+          <Files>
+            <File>
+              <FileName>tm_stm32f4_usb_vcp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\tm_stm32f4_usb_vcp.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_bsp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_bsp.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_dcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_dcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_dcd_int.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_dcd_int.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_cdc_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_cdc_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_cdc_vcp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_cdc_vcp.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_desc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_desc.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_ioreq.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_ioreq.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_req.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_req.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_usr.c</FilePath>
+            </File>
+            <File>
+              <FileName>defines.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\defines.h</FilePath>
+            </File>
+            <File>
+              <FileName>tm_stm32f4_usb_vcp.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\tm_stm32f4_usb_vcp.h</FilePath>
+            </File>
+            <File>
+              <FileName>usb_bsp.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_bsp.h</FilePath>
+            </File>
+            <File>
+              <FileName>usb_conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_conf.h</FilePath>
+            </File>
+            <File>
+              <FileName>usb_core.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_core.h</FilePath>
+            </File>
+            <File>
+              <FileName>usb_dcd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_dcd.h</FilePath>
+            </File>
+            <File>
+              <FileName>usb_dcd_int.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_dcd_int.h</FilePath>
+            </File>
+            <File>
+              <FileName>usb_defines.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_defines.h</FilePath>
+            </File>
+            <File>
+              <FileName>usb_regs.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_regs.h</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_cdc_core.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_cdc_core.h</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_cdc_vcp.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_cdc_vcp.h</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_conf.h</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_core.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_core.h</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_def.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_def.h</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_desc.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_desc.h</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_ioreq.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_ioreq.h</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_req.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_req.h</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_usr.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_usr.h</FilePath>
+            </File>
+            <File>
+              <FileName>misc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\misc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\stm32f4xx_exti.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\stm32f4xx_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_rcc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\stm32f4xx_rcc.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1865,11 +2030,6 @@
               <FilePath>..\common\lib\stm32f4-hal\Inc\stm32f4xx_ll_sdmmc.h</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_ll_usb.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\common\lib\stm32f4-hal\Inc\stm32f4xx_ll_usb.h</FilePath>
-            </File>
-            <File>
               <FileName>stm32f4xx_hal_nor.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\common\lib\stm32f4-hal\Src\stm32f4xx_hal_nor.c</FilePath>
@@ -2149,11 +2309,6 @@
               <FileType>1</FileType>
               <FilePath>..\common\lib\stm32f4-hal\Src\stm32f4xx_ll_sdmmc.c</FilePath>
             </File>
-            <File>
-              <FileName>stm32f4xx_ll_usb.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\common\lib\stm32f4-hal\Src\stm32f4xx_ll_usb.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -2193,6 +2348,181 @@
               <FileName>mcu_comm_bus.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\common\board-drivers\data-exchange-bus\mcu_comm_bus.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>usb-cdc</GroupName>
+          <Files>
+            <File>
+              <FileName>tm_stm32f4_usb_vcp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\tm_stm32f4_usb_vcp.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_bsp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_bsp.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_dcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_dcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_dcd_int.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_dcd_int.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_cdc_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_cdc_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_cdc_vcp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_cdc_vcp.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_desc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_desc.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_ioreq.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_ioreq.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_req.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_req.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_usr.c</FilePath>
+            </File>
+            <File>
+              <FileName>defines.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\defines.h</FilePath>
+            </File>
+            <File>
+              <FileName>tm_stm32f4_usb_vcp.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\tm_stm32f4_usb_vcp.h</FilePath>
+            </File>
+            <File>
+              <FileName>usb_bsp.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_bsp.h</FilePath>
+            </File>
+            <File>
+              <FileName>usb_conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_conf.h</FilePath>
+            </File>
+            <File>
+              <FileName>usb_core.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_core.h</FilePath>
+            </File>
+            <File>
+              <FileName>usb_dcd.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_dcd.h</FilePath>
+            </File>
+            <File>
+              <FileName>usb_dcd_int.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_dcd_int.h</FilePath>
+            </File>
+            <File>
+              <FileName>usb_defines.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_defines.h</FilePath>
+            </File>
+            <File>
+              <FileName>usb_regs.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usb_regs.h</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_cdc_core.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_cdc_core.h</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_cdc_vcp.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_cdc_vcp.h</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_conf.h</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_core.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_core.h</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_def.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_def.h</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_desc.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_desc.h</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_ioreq.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_ioreq.h</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_req.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_req.h</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_usr.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\usbd_usr.h</FilePath>
+            </File>
+            <File>
+              <FileName>misc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\misc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\stm32f4xx_exti.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\stm32f4xx_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_rcc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\libs\usb_cdc_device\stm32f4xx_rcc.c</FilePath>
             </File>
           </Files>
         </Group>

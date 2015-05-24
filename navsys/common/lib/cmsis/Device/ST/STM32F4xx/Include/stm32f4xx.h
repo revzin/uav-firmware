@@ -195,6 +195,8 @@ typedef enum
 #define POSITION_VAL(VAL)     (__CLZ(__RBIT(VAL))) 
 
 
+//#define assert_param(x) ;
+
 /**
   * @}
   */
