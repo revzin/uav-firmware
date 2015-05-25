@@ -14,6 +14,14 @@ float RMC_GetLat(void);
 /* долгода в градусах. Западная долгота - отрицателная */
 float RMC_GetLon(void);
 
+/* высота ASL в метрах */
+float RMC_GetASL(void);
+
+/* ошибка в метрах */
+float RMC_GetHDOP(void);
+
+/* количество спутников */
+int RMC_GetNumSat(void);
 
 RMC_Status_n RMC_GetStatus(void);
 
@@ -24,10 +32,13 @@ typedef struct
 	char _reserved; /* паддинг до 32 бит */
 } RMC_FixTime;
 
+
 /* получить время записи */
 void RMC_GetFixTime(RMC_FixTime *ft);
 
 /* обработчик прерывания UART5 */
 void RMC_UART5_Handler(void);
+
+/* */
 
 #endif

@@ -23,6 +23,9 @@ RMC_Status_n parselat(void);
 RMC_Status_n parselatd(void);
 RMC_Status_n parselon(void);
 RMC_Status_n parselond(void);
+RMC_Status_n parsehdop(void);
+RMC_Status_n parsealt(void);
+RMC_Status_n parsenumsat(void);
 
 void setfail(RMC_Status_n code);
 
@@ -37,25 +40,33 @@ void threadunlock(void);
 
 /* --------------------------- */
 
-/* состояния парсинга RMC-строки */
+/* состояния парсинга GGA-строки */
 typedef enum
 {
 	IDLE,
 	ID,
 	TOF,
-	STAT,
 	LAT,
 	LATD,
 	LON,
-	LOND
+	LOND,
+	STAT,
+	NUMSAT,
+	HDOP,
+	ALT
 } rxstate_n;
 
 
 typedef struct 
 {
-	float lat, lon;
+	float lat, lon, 
+	height, 
+	hdop_acc;
+	int numsat;
 	RMC_FixTime fixtime;
 }	nav_data;
+
+
 
 nav_data g_navdata;
 
@@ -125,12 +136,13 @@ RMC_Status_n RMC_GetStatus(void)
 
 /* ------------------------------ */
 
+
 /* обработчик прерывания по приходу */
 void RMC_UART5_Handler(void)
 {
 	/* конечный автомат, пробегает по RMC-строке, приходящей по одному байту с UART */
 	char rx = UART5->DR;
-	
+		
 	switch (g_state) {
 		case IDLE:
 		{
@@ -147,10 +159,8 @@ void RMC_UART5_Handler(void)
 				if (!parseid()) {
 					nextstate();
 				} 
-				else {
-					//setfail(NMEA_PARSE_FAILED);
+				else 
 					idlestate();
-				}
 			}
 			else {
 				next(rx);
@@ -162,14 +172,86 @@ void RMC_UART5_Handler(void)
 		{
 			if (rx == ',') {
 				RMC_Status_n stat = parsetof();
-				
+				nextstate();
 				if (!stat) {
-					nextstate();
+					g_status = GOOD;
 				} 
 				else {
 					setfail(stat);
-					memset(&g_navdata.fixtime, 0, sizeof(RMC_FixTime));
-					idlestate();
+					//memset(&g_navdata.fixtime, 0, sizeof(RMC_FixTime));
+				}
+			}
+			else {
+				next(rx);
+			}
+			return;				
+		}
+		
+		/* --------------------- */
+		case LAT:
+		{
+			if (rx == ',') {
+				RMC_Status_n s = parselat();
+				nextstate();
+				if (!s) {
+					g_status = GOOD;
+				} 
+				else {
+					setfail(s);
+				}
+			}
+			else {
+				next(rx);
+			}
+			return;				
+		}
+		/* --------------------- */
+		case LATD:
+		{
+			if (rx == ',') {
+				RMC_Status_n s = parselatd();
+				if (!s) {
+					g_status = GOOD;
+				} 
+				else {
+					setfail(s);
+				}
+				nextstate();
+			}
+			else {
+				next(rx);
+			}
+			return;				
+		}
+		/* --------------------- */
+		case LON:
+		{
+			if (rx == ',') {
+				RMC_Status_n s = parselon();
+				nextstate();
+				if (!s) {
+					g_status = GOOD;
+				} 
+				else {
+					setfail(s);
+				}
+			}
+			else {
+				next(rx);
+			}
+			return;		
+		}
+		/* --------------------- */
+		case LOND:
+		{
+			if (rx == ',') {
+				RMC_Status_n s = parselond();
+				nextstate();
+				if (!s) {
+					g_status = GOOD;
+				} 
+				else {
+					setfail(s);
 				}
 			}
 			else {
@@ -183,9 +265,45 @@ void RMC_UART5_Handler(void)
 			if (rx == ',') {
 				int stat = parsestat();
 				if (!stat) {
-					/* всё хорошо, приёмник сказал 'A' = достоверные данные */
-					nextstate();
+					/* всё хорошо */			
 					g_status = GOOD;
+				} 
+				else {
+					setfail((RMC_Status_n) stat);
+				}
+				nextstate();
+			}
+			else {
+				next(rx);
+			}
+			return;
+		}
+		/* --------------------- */
+		case NUMSAT:
+		{
+			if (rx == ',') {
+
+				RMC_Status_n stat = parsenumsat();
+				if (!stat) {
+					nextstate();
+				} 
+				else {
+					setfail((RMC_Status_n) stat);
+					idlestate();
+				}
+			}
+			else {
+				next(rx);
+			}
+			return;
+		}
+		/* --------------------- */
+		case HDOP:
+		{
+			if (rx == ',') {
+				RMC_Status_n stat = parsehdop();
+				if (!stat) {
+					nextstate();
 				} 
 				else {
 					setfail((RMC_Status_n) stat);
@@ -199,72 +317,22 @@ void RMC_UART5_Handler(void)
 			return;
 		}
 		/* --------------------- */
-		case LAT:
+		case ALT:
 		{
 			if (rx == ',') {
-				if (!parselat()) {
-					nextstate();
+				RMC_Status_n stat = parsealt();
+				if (!stat) {
+					idlestate();
 				} 
 				else {
-					setfail(RECIEVER_REPORTS_WARNING);
+					setfail(stat);
 					idlestate();
 				}
 			}
 			else {
 				next(rx);
 			}
-			return;				
-		}
-		/* --------------------- */
-		case LATD:
-		{
-			if (rx == ',') {
-				if (!parselatd()) {
-					nextstate();
-				} 
-				else {
-					setfail(NMEA_PARSE_FAILED);
-					idlestate();
-				}
-			}
-			else {
-				next(rx);
-			}
-			return;				
-		}
-		/* --------------------- */
-		case LON:
-		{
-			if (rx == ',') {
-				if (!parselon()) {
-					nextstate();
-				} 
-				else {
-					setfail(RECIEVER_REPORTS_WARNING);
-					idlestate();
-				}
-			}
-			else {
-				next(rx);
-			}
-			return;		
-		}
-		/* --------------------- */
-		case LOND:
-		{
-			if (rx == ',') {
-				if (!parselond()) {
-					idlestate();
-				} 
-				else {
-					setfail(NMEA_PARSE_FAILED);
-					idlestate();
-				}
-			}
-			else {
-				next(rx);
-			}
-			return;				
+			return;
 		}
 	}
 	
@@ -294,14 +362,14 @@ void idlestate() {
 
 int parseid() {
 	/* отбрасываюся все сообщения, кроме GPRMC */
-	return  strncmp("GPRMC", g_buffer, strlen("GPRMC"));
+	return  strncmp("GPGGA", g_buffer, strlen("GPGGA"));
 }
 
 RMC_Status_n parsestat()
 {
-	if (g_buffer[0] == 'A')
+	if (g_buffer[0] == '1' || g_buffer[0] == '2')
 		return GOOD;
-	if (g_buffer[0] == 'V')
+	if (g_buffer[0] == '0')
 		return RECIEVER_REPORTS_WARNING;
 	else
 		return NMEA_PARSE_FAILED;
@@ -366,7 +434,7 @@ RMC_Status_n parselat()
 {		
 	g_navdata.lat = getangle(g_buffer, 1);
 	if (g_navdata.lat == 0.0f)
-		return NMEA_PARSE_FAILED;
+		return RECIEVER_REPORTS_WARNING;
 	return GOOD;
 }
 
@@ -379,17 +447,49 @@ RMC_Status_n parselatd()
 		/* ничего не происходит */
 	}
 	else {
-		return NMEA_PARSE_FAILED;
+		return RECIEVER_REPORTS_WARNING;
 	}
 	return GOOD;
 }
 
+RMC_Status_n parsealt()
+{
+	g_navdata.height = atof(g_buffer);
+	if (g_navdata.height == 0.0f)
+		return RECIEVER_REPORTS_WARNING;
+	return GOOD;
+}
+
+RMC_Status_n parsehdop()
+{
+	g_navdata.hdop_acc = atof(g_buffer);
+	if (g_navdata.hdop_acc == 0.0f)
+		return RECIEVER_REPORTS_WARNING;
+	return GOOD;
+}
+
+RMC_Status_n parsenumsat()
+{
+	int ns = atoi(g_buffer);
+	if (ns > 2 && ns < 16)	{
+		g_navdata.numsat = ns;
+		return GOOD;
+	} 
+	else if (ns >= 0 && ns < 3)	{
+		g_navdata.numsat = ns;
+		return RECIEVER_REPORTS_WARNING;
+	} 
+	else {
+		g_navdata.numsat = 0;
+		return NMEA_PARSE_FAILED;
+	}
+}
 
 RMC_Status_n parselon() 
 {	
 	g_navdata.lon = getangle(g_buffer, 0);
 		if (g_navdata.lon == 0.0f)
-		return NMEA_PARSE_FAILED;
+		return RECIEVER_REPORTS_WARNING;
 	return GOOD;
 }
 
@@ -402,11 +502,28 @@ RMC_Status_n parselond()
 		/* ничего не происходит */
 	}
 	else {
-		return NMEA_PARSE_FAILED;
+		return RECIEVER_REPORTS_WARNING;
 	}
 	return GOOD;
 }
 
+/* высота ASL в метрах */
+float RMC_GetASL(void)
+{
+	return g_navdata.height;
+}
+
+/* ошибка в метрах */
+float RMC_GetHDOP(void)
+{
+	return g_navdata.hdop_acc;
+}
+
+/* количество спутников */
+int RMC_GetNumSat(void)
+{
+	return g_navdata.numsat;
+}
 
 void threadlock()
 {
@@ -427,3 +544,5 @@ void setfail(RMC_Status_n c)
 {
 	g_status = c;
 }
+
+

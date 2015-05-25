@@ -17,8 +17,6 @@ int main(void)
 	/* настраиваем часы на 168 МГц */
 	BRD_SetupMainClock();
 	
-
-	
 	BRD_ClockFreqs cf;
 	BRD_GetClockFrequences(&cf);
 	
@@ -82,8 +80,12 @@ void NavdataRecieved(void)
 	
 	BRD_ToggleStatusLed();
 	
-	snprintf(sbuf, 100, "%2d:%2d:%2dZ SAT>> LAT = %.4f; LON = %.4f; STATUS = %s; \n", 
-				g_rxnavdata.timeh, g_rxnavdata.timem, g_rxnavdata.times, g_rxnavdata.lat, g_rxnavdata.lon, psz);
+	
+	
+	snprintf(sbuf, 200, "%2d:%2d:%2d: %dSAT>> LAT = %.4f; LON = %.4f; HEIGHT = %.2f ASL;\n" 
+	                    "                     HDOP = %.2f; STATUS = %s;\n", 
+				g_rxnavdata.timeh, g_rxnavdata.timem, g_rxnavdata.times, g_rxnavdata.numsat,
+				g_rxnavdata.lat, g_rxnavdata.lon, g_rxnavdata.alt, g_rxnavdata.hdop, psz);
 	
 	if (TM_USB_VCP_GetStatus() == TM_USB_VCP_CONNECTED)
 		TM_USB_VCP_Puts(sbuf);

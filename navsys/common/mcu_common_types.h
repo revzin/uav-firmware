@@ -13,10 +13,11 @@ typedef enum
 /* "упакованные" данные для передачи по шине */
 typedef struct
 {
-	float lat, lon;
+	float lat, lon, alt, hdop;
 	char timeh, timem, times;
 	char status; // RMC_Status_n
-	
+	char numsat;
+	char dpgs_on;
 } PackedNavdata;
 
 #endif

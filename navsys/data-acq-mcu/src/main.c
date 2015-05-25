@@ -33,7 +33,7 @@ int main(void)
 	 * 2) между приёмом букв срабатывает GPTICK 
 	 * 3) GPTICK теперь ждёт вызова threadunlock()
 	 * 4) КА парсинга не может перехватить управление у 
-	 *    прерывания с тем же приоритетом
+	 *    прерывания с тем же приоритетом, чтобы вызывать threadunlock()
 	 * 5) deadlock
 	*/
 	
@@ -56,8 +56,11 @@ void send_navdata(void)
 	tx.timeh = fxt.h;
 	tx.timem = fxt.m;
 	tx.times = fxt.s;
+	tx.hdop = RMC_GetHDOP();
+	tx.numsat = RMC_GetNumSat();
+	tx.alt = RMC_GetASL();
 	
-	/* Передача */
+	/* Передача на главный МК */
 	MCB_TxBUS1(&tx, sizeof(PackedNavdata));
 }
 	
