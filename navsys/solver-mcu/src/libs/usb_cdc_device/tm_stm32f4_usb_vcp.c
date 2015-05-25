@@ -126,6 +126,15 @@ TM_USB_VCP_Result TM_USB_VCP_Puts(char* str) {
 	return TM_USB_VCP_OK;
 }
 
+TM_USB_VCP_Result TM_USB_VCP_Write(char* str, unsigned int len)
+{
+	int i = 0;
+	for (i = 0; i < len; ++i)
+		TM_USB_VCP_Putc(str[i]);
+	
+	return TM_USB_VCP_OK;
+}
+
 uint16_t TM_USB_VCP_Gets(char* buffer, uint16_t bufsize) {
 	uint16_t i = 0;
 	uint8_t c;

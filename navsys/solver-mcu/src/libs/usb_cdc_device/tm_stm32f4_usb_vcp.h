@@ -267,12 +267,23 @@ uint16_t TM_USB_VCP_Gets(char* buffer, uint16_t bufsize);
 TM_USB_VCP_Result TM_USB_VCP_Puts(char* str);
 
 /**
+ * @brief  Puts data to USB VCP
+ * @param  None
+ * @retval Device status:
+ *            - TM_USB_VCP_CONNECTED: Connected to computer
+ *            - other: Not connected and not ready to communicate
+ */
+ 
+TM_USB_VCP_Result TM_USB_VCP_Write(char* str, unsigned int len);
+
+/**
  * @brief  Gets VCP status
  * @param  None
  * @retval Device status:
  *            - TM_USB_VCP_CONNECTED: Connected to computer
  *            - other: Not connected and not ready to communicate
  */
+ 
 TM_USB_VCP_Result TM_USB_VCP_GetStatus(void);
 
 /**
