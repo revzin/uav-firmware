@@ -82,7 +82,7 @@ void NavdataRecieved(void)
 	
 	
 	
-	snprintf(sbuf, 200, "%2d:%2d:%2d: %dSAT>> LAT = %.4f; LON = %.4f; HEIGHT = %.2f ASL;\n" 
+	snprintf(sbuf, 200, "%2d:%2d:%2d: %dSAT>> LAT = %.7f; LON = %.7f; HEIGHT = %.2f ASL;\n" 
 	                    "                     HDOP = %.2f; STATUS = %s;\n", 
 				g_rxnavdata.timeh, g_rxnavdata.timem, g_rxnavdata.times, g_rxnavdata.numsat,
 				g_rxnavdata.lat, g_rxnavdata.lon, g_rxnavdata.alt, g_rxnavdata.hdop, psz);
