@@ -10,8 +10,22 @@
 #include "string.h" // memcpy
 
 
-void NavdataRecieved(void);
+/* JSON-отчёт о навигации */
+#define JSON_STRING "{\"navdata\": {\n"			\
+					"    \"numsat\" : \"%d\",\n"\
+					"    \"status\" : \"%s\",\n"\
+					"    \"time\": {\n"			\
+					"        \"h\": %d,\n"		\
+					"        \"m\": %d,\n"		\
+					"        \"s\": %d\n "		\
+					"   },\n"					\
+					"   \"lat\": %.6f,\n"		\
+					"   \"lon\": %.6f,\n"		\
+					"   \"height\": %.6f,\n"	\
+					"   \"hdop\": %.6f\n"		\
+					"}}\n"
 
+void NavdataRecieved(void);
 
 PackedNavdata g_rxnavdata;
 
@@ -48,7 +62,7 @@ int main(void)
 /* Коллбек, когда приходят навигационные данные. Печатает их по USB. */
 void NavdataRecieved(void)
 {
-	static char sbuf[100] = {'\0'}; /* буфер для информационной строки */
+	static char sbuf[500] = {'\0'}; /* буфер для информационной строки */
 	
 	/* статусы приёмника */
 	static char sz_good[] = {"GOOD"};
@@ -61,7 +75,7 @@ void NavdataRecieved(void)
 	/* чтобы переключить, надо прислать b(inary) или a(scii) в порт устройства */
 	static int mode = 1;
 	
-	char *psz;
+	char *status_string;
 	
 	/* если есть USB-соединение... */
 	if (TM_USB_VCP_GetStatus() == TM_USB_VCP_CONNECTED) {
@@ -79,41 +93,44 @@ void NavdataRecieved(void)
 			switch (g_rxnavdata.status) {
 				case GOOD:
 				{
-					psz = sz_good;
+					status_string = sz_good;
 					break;
 				}
 				case RECIEVER_REPORTS_WARNING:
 				{
-					psz = sz_warning;
+					status_string = sz_warning;
 					break;
 				}
 				case NMEA_PARSE_FAILED:
 				{
-					psz = sz_parse_failed;
+					status_string = sz_parse_failed;
 					break;
 				}
 				case POWER_UP:
 				{
-					psz = sz_powerup;
+					status_string = sz_powerup;
 					break;
 				}
 				default:
-					psz = sz_messedup;
+					status_string = sz_messedup;
 			}
 			
 
-			/* готовим информационную строку */
-			snprintf(sbuf, 200, "%2d:%2d:%2d: %2dSAT>> LAT = %.7f; LON = %.7f; HEIGHT = %.2f ASL;\n" 
-								"                     HDOP = %.2f; STATUS = %s;\n", 
-						g_rxnavdata.timeh, g_rxnavdata.timem, g_rxnavdata.times, g_rxnavdata.numsat,
-						g_rxnavdata.lat, g_rxnavdata.lon, g_rxnavdata.alt, g_rxnavdata.hdop, psz);
+			/* готовим информационную строку (JSON) */
+			snprintf(sbuf, 1000, JSON_STRING,
+						g_rxnavdata.numsat,
+						status_string,
+						g_rxnavdata.timeh, g_rxnavdata.timem, g_rxnavdata.times,
+						g_rxnavdata.lat, g_rxnavdata.lon, 
+						g_rxnavdata.alt, 
+						g_rxnavdata.hdop);
 		
 			/* печатаем в порт иформационную строку */
 			TM_USB_VCP_Puts(sbuf);	
 		}
 		else {
 			uint8_t modec;
-			if (TM_USB_VCP_Getc(&modec) == TM_USB_VCP_DATA_OK){
+			if (TM_USB_VCP_Getc(&modec) == TM_USB_VCP_DATA_OK) {
 				if (modec == 'a') {
 					/* переключаемся в текстовый режим */
 					mode = 0;
