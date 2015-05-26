@@ -59,7 +59,7 @@ void NavdataRecieved(void)
 	
 	/* режим вывода, 0 = текстовый, 1 = двоичный */
 	/* чтобы переключить, надо прислать b(inary) или a(scii) в порт устройства */
-	static int mode = 0;
+	static int mode = 1;
 	
 	char *psz;
 	
